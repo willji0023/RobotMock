@@ -28,7 +28,7 @@ RobotMock::~RobotMock() {
 
 void RobotMock::SetSetpoint(double inches) {
     using namespace std::chrono;
-    auto elapsed = std::chrono::milliseconds(2000 / 90) /
+    auto elapsed = std::chrono::milliseconds(2000 / 90) *
         std::abs(static_cast<int>(m_setpoint - inches));
     m_finishTime = std::chrono::system_clock::now() + elapsed;
     m_setpoint = inches;
@@ -42,7 +42,7 @@ bool RobotMock::AtSetpoint() const {
     return std::chrono::system_clock::now() >= m_finishTime;
 }
 
-int RobotMock::SetClaw(bool closed) {
+void RobotMock::SetClaw(bool closed) {
     m_isClosed = closed;
 
     std::cout << "Called SetClaw(" << std::to_string(closed) << ")"

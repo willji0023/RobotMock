@@ -5,13 +5,14 @@
 #include "Timer.hpp"
 
 enum class State {
-	ready, // raising tongs height state
+	ready, // waiting for button to pressed state
 	armOpen, // tongs opening state
 	armOpenTimer, // tongs opening timer state
 	heightDecrease, // lowering tongs height state
 	armGrab, // tongs closing state
 	armGrabTimer, // tongs closing state timer
-	finished // tongs closed and done state
+	heightIncrease, // raising tongs height state
+	finished // waiting for robot to reach start height state
 };
 
 int main() {
@@ -26,20 +27,16 @@ int main() {
         case State::ready:
         	if (robot.GetPressed()){
         		std::cout << "Button was push and robot is ready to go\n";
-        		robot.SetSetpoint(KHeight);
         		state = State::armOpen;
         	}
         	break;
         case State::armOpen:
-        	if (robot.AtSetpoint()){
-        		std::cout << "Robot is at starting point\n";
-        	    state = State::armOpenTimer;
-        	    robot.SetClaw(false);
-        	    timer.Start();
-        	}
+        	state = State::armOpenTimer;
+        	robot.SetClaw(false);
+        	timer.Start();
         	break;
         case State::armOpenTimer:
-        	if (timer.HasPeriodPassed(3.0)){
+        	if (timer.HasPeriodPassed(0.4)){
         		state = State::heightDecrease;
         		timer.Reset();
         	}
@@ -60,17 +57,23 @@ int main() {
         	}
         	break;
         case State::armGrabTimer:
-        	if (timer.HasPeriodPassed(3.0)){
-        		state = State::finished;
+        	if (timer.HasPeriodPassed(0.4)){
+        		state = State::heightIncrease;
         		timer.Reset();
         	}
         	break;
-        case State::finished:
+        case State::heightIncrease:
         	if (robot.GetClaw()){
         		std::cout << "Claw has been closed\n";
-        		state = State::ready;
+        		state = State::finished;
+        		robot.SetSetpoint(KHeight);
         	}
         	break;
+        case State::finished:
+        	if (robot.AtSetpoint()){
+        		std::cout << "Robot is ready and waiting for button to be pushed\n";
+        		state = State::ready;
+        	}
     }
 }
 

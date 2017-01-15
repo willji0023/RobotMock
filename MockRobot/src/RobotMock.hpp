@@ -12,14 +12,18 @@ public:
     RobotMock();
     ~RobotMock();
 
-    // Sets target height of elevator.
+    /*
+     * Sets target height of elevator. The setpoint can range from 0 to 90
+     * inches. The longer the distance to travel, the longer it takes to reach
+     * setpoint. The time taken from 0 to 90 inches is about 2 seconds.
+     */
     void SetSetpoint(double inches);
 
     // Returns true once mock feedback controller has reached target height
     bool AtSetpoint() const;
 
     // Opens/closes claw
-    int SetClaw(bool closed);
+    void SetClaw(bool closed);
 
     // Returns true if claw is closed
     bool GetClaw() const;
